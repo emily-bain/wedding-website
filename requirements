@@ -1,0 +1,5 @@
+django
+gunicorn
+daphne
+channels
+
