@@ -36,7 +36,7 @@ class Guest(models.Model):
 
     def toJSON(self):
         return {
-            'id': self.uuid
+            'id': self.uuid,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'meal': self.meal,

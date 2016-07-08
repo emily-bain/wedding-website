@@ -1,2 +1,6 @@
 *.swp
-
+*.pyc
+node_modules/
+wedding_site/webpack-stats.json
+db.sqlite3
+wedding_site/static/bundles/*
