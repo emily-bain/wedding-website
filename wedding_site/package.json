@@ -5,12 +5,15 @@
   "description": "Wedding Website for Jeff and Nicole",
   "main": "webpack.config.js",
   "dependencies": {
-    "react": "^15.2.0",
-    "react-dom": "^15.2.0"
+    "material-ui": "^0.15.2",
+    "react": "^15.2.1",
+    "react-dom": "^15.2.0",
+    "react-tap-event-plugin": "^1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
     "clean-webpack-plugin": "^0.1.9",
@@ -31,6 +34,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "stats": "webpack --profile --json > stats.json",
     "build": "webpack",
+    "dev-build": "webpack --watch",
     "clean": "rm build/*"
   },
   "repository": {

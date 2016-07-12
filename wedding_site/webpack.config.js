@@ -18,7 +18,7 @@ const PATHS = {
   build: path.join(__dirname, 'static', 'bundles')
 }
 
-const common = {
+var common = {
   entry: {
     style: PATHS.style,
     app: PATHS.app
@@ -29,9 +29,6 @@ const common = {
     chunkFilename: '[hash].js'
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      title: "RSVP for Jeff and Nicole's Wedding"
-    }),
     new BundleTracker({filename: './webpack-stats.json'})
   ],
   module: {
@@ -44,15 +41,23 @@ const common = {
           presets: ['react', 'es2015']
         },
         include: PATHS.app,
-        exclude: /'node_modules'/
+        exclude: /node_modules/
       }
     ]
   }
 };
 
+common = merge(common,
+  parts.extractBundle({
+    name: 'vendor',
+    entries: Object.keys(pkg.dependencies)
+  })
+);
+
 var config;
 
 switch(process.env.npm_lifecycle_event) {
+//  case 'dev-build':
   case 'build':
   case 'stats':
     config = merge(common,
@@ -63,10 +68,6 @@ switch(process.env.npm_lifecycle_event) {
         'process.env.NODE_ENV',
         'production'
       ),
-      parts.extractBundle({
-        name: 'vendor',
-        entries: Object.keys(pkg.dependencies)
-      }),
       parts.minify(),
       parts.extractCSS(PATHS.style),
       parts.purifyCSS([PATHS.app]),
