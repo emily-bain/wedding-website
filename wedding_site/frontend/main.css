@@ -1,9 +1,11 @@
 body {
-    background: cornsilk;
+    font-family: "Roboto", sans-serif;
+    background: #655643;
 }
 
 label {
     margin-right: 4px;
+    display: block;
 }
 
 .paper {
@@ -12,9 +14,12 @@ label {
     margin-right: auto;
     margin-top: 8px;
     margin-bottom: 8px;
-    padding: 8px;
 }
 
-fieldset {
-    border: none;
+.field {
+    margin: 16px 0;
+}
+
+.content {
+    padding: 0px 8px;
 }

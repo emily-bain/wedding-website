@@ -5,10 +5,16 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
 
-from rsvp.models import Invitation, Guest
+from rsvp.models import Invitation, Guest, Meal
 
 class RSVPView(TemplateView):
     template_name='rsvp/rsvp_page.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['meal_choices'] = json.dumps([meal.toJSON() for meal in
+                                              Meal.objects.all()])
+        return context
 
 
 class JSONError(Exception):

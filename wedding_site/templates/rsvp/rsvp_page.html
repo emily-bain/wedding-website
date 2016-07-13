@@ -5,37 +5,14 @@
         <meta http-equiv="X-UA-Compatible" content="ID=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>RSVP for Jeff &amp; Nicole's Wedding</title>
-        <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                background: #ECD078;
-                color: #53777a;
-            }
-            .person {
-                width: 500px;
-                padding: 5px 20px;
-                background: #ECD078;
-            }
-            .btn-yes {
-                color: #542437;
-                background: #E04962;
-            }
-            .btn-yes.selected {
-                background: #C02942;
-            }
-            .btn-no {
-                color: #542437;
-                background: #E04962;
-            }
-            .btn-no.selected {
-                background: #C02942
-            }
-            fieldset {
-                padding: 5px;
-            }
-        </style>
+        <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
         {% render_bundle 'manifest' %}
         {% render_bundle 'style' %}
+        <script type="text/javascript">
+            context = {
+                mealChoices: {{ meal_choices|safe }}
+            }
+        </script>
     </head>
     <body>
         <div id="mount"></div>

@@ -22,10 +22,17 @@ class Meal(models.Model):
     def __str__(self):
         return self.name
 
+    def toJSON(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 class Guest(models.Model):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     invitation = models.ForeignKey('rsvp.Invitation', related_name='guests')
+    guest_of = models.ForeignKey('rsvp.Guest', related_name='guests', null=True)
     meal = models.ForeignKey('rsvp.Meal', null=True, blank=True)
     notes = models.CharField(max_length=2048, blank=True)
     attending = models.NullBooleanField()
@@ -80,3 +87,7 @@ class Guest(models.Model):
             self.meal = meal
 
         self.notes = reply.get('notes', None)
+
+    class QuerySet(object):
+        def primary_guests(self):
+            return self.filter(guest_of__isnull=True)
