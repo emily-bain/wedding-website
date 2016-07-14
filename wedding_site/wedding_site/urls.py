@@ -20,6 +20,7 @@ from django.contrib import admin
 from rsvp.views import RSVPView
 
 urlpatterns = [
-    url(r'^rsvp/', RSVPView.as_view()),
     url(r'^admin/', admin.site.urls),
+    url(r'^$', RSVPView.as_view()),
+    url(r'^rsvp/', RSVPView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
