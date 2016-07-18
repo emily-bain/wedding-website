@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')aj)#-)rr1ps7qwcm-h*d5sb4uf5c#xn_ckfv#p*8fqdg8v*+%'
+SECRET_KEY = 'GenerateAProductionKeyAndPutItInLocalSettings'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -133,3 +133,5 @@ WEBPACK_LOADER = {
         'STATS_FILE': 'webpack-stats.json'
     }
 }
+
+from .local_settings import *

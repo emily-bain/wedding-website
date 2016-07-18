@@ -1,5 +1,5 @@
 import React from 'react';
-import Paper from 'material-ui/paper';
+import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import { RadioButtonGroup, RadioButton } from 'material-ui/RadioButton'
 import RaisedButton from 'material-ui/RaisedButton';
