@@ -15,7 +15,7 @@ const PATHS = {
     path.join(__dirname, 'node_modules', 'purecss'),
     path.join(__dirname, 'frontend', 'main.css')
   ],
-  build: path.join(__dirname, 'static', 'bundles')
+  build: path.join(__dirname, 'bundles')
 }
 
 var common = {
