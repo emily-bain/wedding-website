@@ -250,7 +250,7 @@ class RSVP extends React.Component {
     const guest = this.getCurrentGuest();
     const plusOneID = plusOnes[guest.id];
     let extraFields;
-    if (plusOneID) {
+    if (plusOneID && guest.values.attending) {
       const plusOne = guestsByID[plusOneID];
       extraFields = (
         <div className='field'>
