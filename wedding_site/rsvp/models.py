@@ -32,7 +32,7 @@ class Guest(models.Model):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     invitation = models.ForeignKey('rsvp.Invitation', related_name='guests')
-    guest_of = models.ForeignKey('rsvp.Guest', related_name='guests', null=True)
+    guest_of = models.ForeignKey('rsvp.Guest', related_name='guests', null=True, blank=True)
     meal = models.ForeignKey('rsvp.Meal', null=True, blank=True)
     notes = models.CharField(max_length=2048, blank=True)
     attending = models.NullBooleanField()
