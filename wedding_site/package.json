@@ -5,6 +5,8 @@
   "description": "Wedding Website for Jeff and Nicole",
   "main": "webpack.config.js",
   "dependencies": {
+    "axios": "^0.13.1",
+    "js-cookie": "^2.1.2",
     "material-ui": "^0.15.2",
     "react": "^15.2.1",
     "react-dom": "^15.2.0",

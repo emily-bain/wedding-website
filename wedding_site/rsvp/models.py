@@ -1,6 +1,15 @@
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.db import models
+
+class ReplyError(Exception):
+    def __init__(self, errors_dict):
+        self.errors_dict = errors_dict
+
+    @property
+    def errors(self):
+        return self.errors_dict
 
 class Invitation(models.Model):
     name = models.CharField(max_length=255)
@@ -8,6 +17,40 @@ class Invitation(models.Model):
 
     def __str__(self):
         return self.name
+
+    def handle_reply(self, guests):
+        meals_by_id = dict((meal.id, meal) for meal in Meal.objects.all())
+        errors = {}
+        valid_guests = []
+        for guest_data in guests:
+            guest_id = guest_data.get('id')
+
+            try:
+                guest = self.guests.get(uuid=uuid.UUID(guest_id))
+            except ValidationError:
+                errors[guest_id] = {'__all__': 'No guest with that guest id'}
+                continue
+
+            guest.first_name = guest_data.get('first_name', None)
+            guest.last_name = guest_data.get('last_name', None)
+            guest.attending = guest_data.get('attending', None)
+            guest.notes = guest_data.get('notes', '')
+            meal_id = guest_data.get('meal', None)
+            guest.meal = meals_by_id.get(meal_id, None)
+
+            try:
+                guest.clean()
+            except ValidationError as e:
+                errors[guest_id] = dict(e)
+            else:
+                valid_guests.append(guest)
+
+        if errors:
+            raise ReplyError(errors)
+        else:
+            for guest in valid_guests:
+                guest.save()
+
 
     def toJSON(self):
         return {
@@ -43,50 +86,43 @@ class Guest(models.Model):
 
     def toJSON(self):
         return {
-            'id': self.uuid,
+            'id': str(self.uuid),
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'meal': self.meal,
+            'meal': self.meal_id,
             'notes': self.notes,
             'attending': self.attending,
+            'guest_of': str(self.guest_of.uuid) if self.guest_of else None
         }
 
-    def update_from_reply(self, reply):
-        """
-
-        """
+    def clean(self):
+        fields = ['first_name', 'last_name', 'attending', 'meal', 'notes']
         errors = {}
+        for field in fields:
+            validator = getattr(self, 'clean_{}'.format(field), lambda: None)
+            try:
+                validator()
+            except ValidationError as e:
+                errors[field] = e
+
+        if errors:
+            raise ValidationError(errors)
+
+    def clean_first_name(self):
         if not self.first_name:
-            first_name = reply.get('first_name')
-            if not first_name:
-                errors['first_name'] = 'First Name is a required field'
-            else:
-                self.first_name = reply['first_name']
+            raise ValidationError('First name is a required field')
 
+    def clean_last_name(self):
         if not self.last_name:
-            last_name = reply.get('last_name')
-            if not last_name:
-                errors['last_name'] = 'Last Name is a required field'
-            else:
-                self.last_name = last_name
+            raise ValidationError('Last name is a required field')
 
-        attending = reply.get('attending')
-        if attending is None:
-            errors['attending'] = 'Attending is a required field'
-        elif not isinstance(attending, bool):
-            errors['attending'] = 'Attending must be a boolean value'
-        else:
-            self.attending = attending
+    def clean_attending(self):
+        if not isinstance(self.attending, bool):
+            raise ValidationError('You must choose Yes or No')
 
-        meal = reply.get('meal', None)
-        if not attending and meal is not None:
-            errors['meal'] = 'Non-attending guests may not select a meal'
-        elif attending and not meal:
-            errors['meal'] = 'Meal is required for guests who are attending'
-        else:
-            self.meal = meal
-
-        self.notes = reply.get('notes', None)
+    def clean_meal(self):
+        if self.attending and not self.meal:
+            raise ValidationError('You must choose a meal if you are attending')
 
     class QuerySet(object):
         def primary_guests(self):

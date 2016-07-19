@@ -125,9 +125,9 @@ class RSVP extends React.Component {
         const guest = {
           id: guestData.id,
           values: {
-            firstName: guestData.firstName,
-            lastName: guestData.lastName,
-            attending: guestData.attending,
+            firstName: guestData.first_name,
+            lastName: guestData.last_name,
+            attending: guestData.attending || false, // No nulls, no how.
             meal: guestData.meal,
             notes: guestData.notes
           },
@@ -135,10 +135,10 @@ class RSVP extends React.Component {
         }
 
         guestsByID[guest.id] = guest;
-        if (!guestData.guestOf) {
+        if (!guestData.guest_of) {
           primaryGuests.push(guest.id);
         } else {
-          plusOnes[guestData.guestOf] = guest.id
+          plusOnes[guestData.guest_of] = guest.id
         }
 
       });
@@ -152,7 +152,7 @@ class RSVP extends React.Component {
       });
     }, (error) => {
       this.setState({
-        invitationError: error
+        invitationError: 'Invalid Guest Code'
       });
     });
   }
@@ -210,9 +210,8 @@ class RSVP extends React.Component {
       } else {
         this.setState({
           stage: 2
-        })
+        });
       }
-      this.setState({});
     } else {
       this.setState({
         plusOne: true
@@ -221,10 +220,26 @@ class RSVP extends React.Component {
   }
 
   submitGuests() {
-    const { guests } = this.state;
+    const { inviteCode, guestsByID } = this.state;
+    // We could really use a .items() here, Javascript
+    const guests = [];
+    Object.keys(guestsByID).forEach(key => {
+      const guestData = guestsByID[key];
+      const guest = {
+        id: guestData.id,
+        first_name: guestData.values.firstName,
+        last_name: guestData.values.lastName,
+        attending: guestData.values.attending,
+        meal: guestData.values.meal,
+        notes: guestData.values.notes
+      };
+      guests.push(guest);
+    });
 
-    RSVPService.respond(guests).then(() => {
-
+    RSVPService.respond(inviteCode, guests).then(() => {
+      this.setState({
+        stage: 3
+      });
     }, (errors) => {
 
     });
@@ -236,6 +251,7 @@ class RSVP extends React.Component {
         floatingLabelText="Invitation Code"
         value={this.state.inviteCode}
         errorText={this.state.invitationError}
+        style={{marginBottom: '20px'}}
         fullWidth={true}
         onChange={(e, val) => {
           this.setState({inviteCode: val, invitationError: null});
@@ -282,7 +298,9 @@ class RSVP extends React.Component {
     switch(this.state.stage) {
       case 0: return this.renderInviteForm()
       case 1: return this.renderGuestForm()
-      default: return <span>Whoops</span>;
+      case 2: return <span>Ready to go?</span>;
+      case 3: return <span>Success!</span>;
+      default: return <span>Something went wrong</span>;
     }
   }
 
@@ -306,7 +324,7 @@ class RSVP extends React.Component {
   render() {
     return (
       <Paper className='paper'>
-        <div className='content'>
+        <div className='content' style={{minHeight: '100px'}}>
           {this.renderRelevantView()}
         </div>
 
