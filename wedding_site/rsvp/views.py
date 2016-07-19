@@ -2,6 +2,8 @@ import json
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView, View
 
 from rsvp.models import Invitation, Guest, Meal, ReplyError
@@ -24,6 +26,7 @@ class InvitationView(View):
         return HttpResponse(json.dumps(data),
                             content_type='application/json')
 
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request, invite_code):
         invite = get_object_or_404(Invitation, code=invite_code)
         body_unicode = request.body.decode('utf-8')
