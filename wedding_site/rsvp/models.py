@@ -39,7 +39,7 @@ class Invitation(models.Model):
             guest.meal = meals_by_id.get(meal_id, None)
 
             try:
-                guest.clean()
+                guest.validate()
             except ValidationError as e:
                 errors[guest_id] = dict(e)
             else:
@@ -95,7 +95,7 @@ class Guest(models.Model):
             'guest_of': str(self.guest_of.uuid) if self.guest_of else None
         }
 
-    def clean(self):
+    def validate(self):
         fields = ['first_name', 'last_name', 'attending', 'meal', 'notes']
         errors = {}
         for field in fields:
@@ -109,11 +109,11 @@ class Guest(models.Model):
             raise ValidationError(errors)
 
     def clean_first_name(self):
-        if not self.first_name:
+        if self.attending and not self.first_name:
             raise ValidationError('First name is a required field')
 
     def clean_last_name(self):
-        if not self.last_name:
+        if self.attending and not self.last_name:
             raise ValidationError('Last name is a required field')
 
     def clean_attending(self):
