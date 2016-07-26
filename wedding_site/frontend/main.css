@@ -12,8 +12,8 @@ label {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 32px;
+    margin-bottom: 32px;
 }
 
 .field {
@@ -21,5 +21,5 @@ label {
 }
 
 .content {
-    padding: 0px 16px;
+    padding: 10px 16px;
 }

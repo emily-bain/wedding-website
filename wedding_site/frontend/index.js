@@ -4,13 +4,26 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import muiTheme from './theme';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import App from './RSVPApp';
+import { Router, Route, IndexRoute, hashHistory } from 'react-router';
+
+import Paper from 'material-ui/Paper';
+
+import App from './App';
+import RSVP from './RSVP';
+import Home from './Home';
+import Hotel from './Hotels';
 
 injectTapEventPlugin();
 
 render(
   <MuiThemeProvider muiTheme={muiTheme}>
-    <App mealChoices={context.mealChoices} />
+    <Router history={hashHistory}>
+      <Route path="/" component={App}>
+        <IndexRoute component={Home} />
+        <Route mealChoices={context.mealChoices} path="rsvp" component={RSVP}/>
+        <Route path="hotel" component={Hotel} />
+      </Route>
+    </Router>
   </MuiThemeProvider>,
   document.getElementById('mount')
 );
