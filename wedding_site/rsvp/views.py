@@ -20,6 +20,7 @@ class RSVPView(TemplateView):
 
 class InvitationView(View):
 
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request, invite_code):
         invite = get_object_or_404(Invitation, code=invite_code)
         data = invite.toJSON()

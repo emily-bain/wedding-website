@@ -82,7 +82,11 @@ class Guest(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return "{}, {}".format(self.last_name, self.first_name)
+        return "{}, {} {}".format(
+            self.last_name,
+            self.first_name,
+            "(Guest of {})".format(str(self.guest_of)) if self.guest_of else ''
+        )
 
     def toJSON(self):
         return {
