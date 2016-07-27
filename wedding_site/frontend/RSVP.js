@@ -3,6 +3,7 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import { RadioButtonGroup, RadioButton } from 'material-ui/RadioButton'
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import Toggle from 'material-ui/Toggle';
 
@@ -60,15 +61,24 @@ const GuestForm = (props) => {
       return <RadioButton key={option.id} value={option.id.toString()} label={option.name} />;
     });
 
+    let mealError = ''
+    if (props.errors.meal) {
+      mealError = (
+        <div className='info error'>{props.errors.meal}</div>
+      )
+    }
     meal = (
       <div className='field'>
-        <p>Preferred Entree?</p>
+        <div className='label'>Preferred Entree?</div>
+        {mealError}
+        <div>
         <RadioButtonGroup
           name="meal"
           valueSelected={ currentMeal ? currentMeal.toString() : null}
           onChange={(e, val) => props.onFieldChange('meal', +val)}
           children={mealOptions}
         />
+        </div>
       </div>
     );
 
@@ -106,6 +116,7 @@ class RSVP extends React.Component {
     this.state = {
       inviteCode: '',
       invitationError: null,
+      globalError: null,
       stage: 0,
       currentGuest: null,
       plusOne: false,
@@ -157,6 +168,14 @@ class RSVP extends React.Component {
     });
   }
 
+  toGuestForms() {
+    this.setState({
+      stage: 1,
+      currentGuest: 0,
+      plusOne: false
+    })
+  }
+
   setGuestValue(guestID, field, value) {
     this.setState((state, props) => {
       return ({
@@ -173,6 +192,25 @@ class RSVP extends React.Component {
         }
       });
     });
+  }
+
+  setGuestErrors(guestID, errors) {
+    this.setState((state, props) => {
+      return ({
+        ...state,
+        guestsByID: {
+          ...state.guestsByID,
+          [guestID]: {
+            ...state.guestsByID[guestID],
+            errors: errors
+          }
+        }
+      });
+    });
+  }
+
+  setGlobalError(error) {
+    this.setState({globalError: error});
   }
 
   handleFormDataChange(field, value) {
@@ -236,12 +274,25 @@ class RSVP extends React.Component {
       guests.push(guest);
     });
 
+    // Clear the global error state
+    this.setState({
+      globalError: null
+    });
+
     RSVPService.respond(inviteCode, guests).then(() => {
       this.setState({
         stage: 3
       });
     }, (errors) => {
-
+      Object.keys(errors).map(guestID => {
+        if (guestID === '__all__') {
+          this.setGlobalError(errors[guestID]);
+        } else {
+          const guestErrors = errors[guestID];
+          this.setGuestErrors(guestID, guestErrors);
+        }
+      });
+      this.toGuestForms();
     });
   }
 
@@ -294,12 +345,73 @@ class RSVP extends React.Component {
 
   }
 
+  renderSummary() {
+    const { guestsByID, plusOnes } = this.state;
+    const { mealChoices } = this.props.route;
+
+    const guestSummaries = Object.keys(guestsByID).map(guestID => {
+      const guest = guestsByID[guestID];
+      const attending = guest.values.attending
+      const guestOfGuest = Object.keys(plusOnes).some(primaryGuestID => {
+        return plusOnes[primaryGuestID] === guestID;
+      });
+
+      if (!attending && guestOfGuest) {
+        return '';
+      }
+
+      let meal = '';
+      let notes = '';
+      if (attending) {
+        const choice = mealChoices.find(choice => choice.id == guest.values.meal);
+        meal = <div>Meal: {choice ? choice.name : "None"}</div>;
+        notes = <div>Notes: {guest.values.notes}</div>;
+      }
+
+      return (
+        <div key={guestID} style={{margin: '12px 0px'}}>
+          <div>First Name: {guest.values.firstName}</div>
+          <div>Last Name: {guest.values.lastName}</div>
+          <div>Attending: {attending ? "Yes" : "No"}</div>
+          {meal}
+          {notes}
+        </div>
+      );
+    });
+
+
+    return (
+      <div>
+        <p>Does this all look right?</p>
+        {guestSummaries}
+      </div>
+    );
+  }
+
+  renderSuccessPage() {
+    const { guestsByID } = this.state;
+    const anyAttending = Object.keys(guestsByID).some(function(guestID) {
+      return guestsByID[guestID].values.attending;
+    });
+
+    const personalMessage = (anyAttending ?
+                             "Looking forward to seeing you!" :
+                             "Sorry you can't make it!");
+
+    return (
+      <div>
+        <h3>Thanks!</h3>
+        <p>We've successfully received your RSVP. {personalMessage}</p>
+      </div>
+    );
+  }
+
   renderRelevantView() {
     switch(this.state.stage) {
-      case 0: return this.renderInviteForm()
-      case 1: return this.renderGuestForm()
-      case 2: return <span>Ready to go?</span>;
-      case 3: return <span>Success!</span>;
+      case 0: return this.renderInviteForm();
+      case 1: return this.renderGuestForm();
+      case 2: return this.renderSummary();
+      case 3: return this.renderSuccessPage();
       default: return <span>Something went wrong</span>;
     }
   }
@@ -308,32 +420,54 @@ class RSVP extends React.Component {
     switch(this.state.stage) {
       case 0:
         return (
-          <RaisedButton primary={true} label="Next" onClick={this.fetchGuests.bind(this)}  />
+          <ToolbarGroup lastChild={true}>
+            <RaisedButton primary={true} label="Next" onClick={this.fetchGuests.bind(this)}  />
+          </ToolbarGroup>
         );
       case 1:
         return (
-          <RaisedButton primary={true} label="Next" onClick={this.completeGuest.bind(this)} />
+          <ToolbarGroup lastChild={true}>
+            <RaisedButton primary={true} label="Next" onClick={this.completeGuest.bind(this)} />
+          </ToolbarGroup>
         );
       case 2:
         return (
-          <RaisedButton primary={true} label="Submit" onClick={this.submitGuests.bind(this)} />
+          <ToolbarGroup lastChild={true}>
+            <FlatButton label="Go back" onClick={this.toGuestForms.bind(this)} />
+            <RaisedButton primary={true} label="Submit" onClick={this.submitGuests.bind(this)} />
+          </ToolbarGroup>
         );
     }
   }
 
   render() {
-    return (
-      <Paper className='paper'>
-        <div className='content' style={{minHeight: '100px'}}>
-          {this.renderRelevantView()}
-        </div>
+    let globalError = '';
+    if (this.state.globalError) {
+      globalError = (
+        <Paper
+          className='paper error'
+          style={{
+            backgroundColor: 'bf4c28',
+            color: 'ffffff'
+          }}>
+          {this.state.globalError}
+        </Paper>
+      )
+    }
 
-        <Toolbar>
-          <ToolbarGroup firstChild={true}>
-            {this.renderRelevantActions()}
-          </ToolbarGroup>
-        </Toolbar>
-      </Paper>
+    return (
+      <div>
+        {globalError}
+        <Paper className='paper'>
+          <div className='content' style={{minHeight: '100px'}}>
+            {this.renderRelevantView()}
+          </div>
+
+          <Toolbar style={{justifyContent: 'flex-end'}}>
+              {this.renderRelevantActions()}
+          </Toolbar>
+        </Paper>
+      </div>
     );
   }
 

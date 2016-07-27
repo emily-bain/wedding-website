@@ -23,10 +23,21 @@ class RSVPService {
         headers: {'X-CSRFToken': csrf}
       }).then(response => {
         resolve();
-      }, response => {
+      }).catch(function(errorResponse) {
+        const response = errorResponse.response
         const errors = {};
-        if (false) {
-          // handle proper error response
+        if (response.status === 400) {
+          Object.keys(response.data).map(guestId => {
+            const data = response.data[guestId];
+            errors[guestId] = {
+              firstName: data.first_name,
+              lastName: data.last_name,
+              attending: data.attending,
+              meal: data.meal,
+              notes: data.notes
+            };
+          });
+          errors['__all__'] = 'Something went wrong. Fix the errors below and try again.';
         } else {
           errors['__all__'] = "Something went wrong. Try again?";
         }
