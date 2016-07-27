@@ -6,6 +6,7 @@ const orange = 'e6ac27';
 
 const muiTheme = getMuiTheme({
   palette: {
+    textColor: '#222',
     primary1Color: red,
     //primary2Color: 'bf4d28',
     //primary3Color: 'bf4d28',
@@ -17,6 +18,10 @@ const muiTheme = getMuiTheme({
 
   toggle: {
     trackOnColor: fadedRed
+  },
+
+  svgIcon: {
+    color: '#fff'
   }
 
 });

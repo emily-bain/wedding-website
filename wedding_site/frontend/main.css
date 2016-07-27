@@ -1,6 +1,11 @@
 body {
     font-family: "Roboto", sans-serif;
     background: #655643;
+    color: #444;
+}
+
+a {
+    color: #bf4d28;
 }
 
 label {
