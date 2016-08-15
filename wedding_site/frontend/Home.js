@@ -15,7 +15,7 @@ const Home = (props) => {
         <h4>Where?</h4>
           <p>
             The ceremony and reception will both be held in Cinderella's Cottage
-            at Fantasy Farms, located at 15 Pottery Road, Toronto.
+            at Fantasy Farms, located at 50 Pottery Road, Toronto.
           </p>
           <p>
             Weather permitting the ceremony will be outside on the terrace and
