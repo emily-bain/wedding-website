@@ -10,6 +10,7 @@ const Home = (props) => {
         <p>Welcome to Jeff and Nicole's Wedding Website!</p>
         <p>If you're looking to RSVP, you can click here: <Link to="/rsvp">RSVP</Link></p>
         <p>If you will need a hotel, hotel info is here: <Link to="/hotel">Hotels</Link></p>
+        <p>If you want to know information about gifts, we've got registry info here: <Link to="/registry">Registry</Link></p>
         <h4>When?</h4>
           <p>The wedding will take place on Saturday, November 5th at 5:00PM</p>
         <h4>Where?</h4>

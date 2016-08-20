@@ -12,6 +12,7 @@ import App from './App';
 import RSVP from './RSVP';
 import Home from './Home';
 import Hotel from './Hotels';
+import Gifts from './Gifts';
 
 injectTapEventPlugin();
 
@@ -22,6 +23,7 @@ render(
         <IndexRoute component={Home} />
         <Route mealChoices={context.mealChoices} path="rsvp" component={RSVP}/>
         <Route path="hotel" component={Hotel} />
+        <Route path="registry" component={Gifts} />
       </Route>
     </Router>
   </MuiThemeProvider>,

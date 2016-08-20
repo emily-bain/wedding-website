@@ -14,7 +14,8 @@ export default class App extends React.Component {
     const options = {
       '/': 'Home',
       '/rsvp': 'RSVP',
-      '/hotel': 'Hotels'
+      '/hotel': 'Hotels',
+      '/registry': 'Registry'
     }
 
     const menuItems = Object.keys(options).map(key => {
